@@ -91,10 +91,3 @@ function! vsm#InteractiveReplace()
     call vsm#ComplexRepalce(l:target)
     execute ":norm `z"
 endfunction
-
-function! vsm#SetupMappings()
-    nnoremap <silent> s mz:set opfunc=vsm#HighlightInMotion<CR>g@
-    nnoremap <silent> <leader>r mz:call vsm#InteractiveReplace()<CR>
-    vmap <silent> <leader>r <\Esc>mz:call vsm#InteractiveReplace()<CR>
-endfunction
-call vsm#SetupMappings()
