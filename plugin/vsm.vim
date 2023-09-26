@@ -1,10 +1,15 @@
+" Vim plugin to approximate selecion mode in helix/kakoune
+"
+" Maintainer: Me
+" License: This file is placed in the public domain.
+"
 if exists("g:loaded_vsm") || &cp || v:version < 700
     finish
 endif
 let g:loaded_vsm = 1
 
 " TODO:
-" Add configuration registers to use and marks
+" Add configuration registers to use and marks and maybe color groups
 
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
     let empty_line = "^$"
@@ -30,7 +35,9 @@ endfunction
 
 function! vsm#HighlightWhileReplace(cmdline)
     let l:pattern = trim(getreg('/'),"\%V")
-    call vsm#ComplexRepalce(a:cmdline)
+    try
+        call vsm#ComplexRepalce(a:cmdline)
+    endtry
     exe "redraw"
     exe ":undo!"
     return []
@@ -38,20 +45,24 @@ endfunction
 
 function! vsm#HighlightInMotion(type, ...)
     call inputsave()
+    let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
     let l:t = ""
     set nohlsearch
     execute "norm `]v`[\<esc>"
+    exe "redraw"
     let l:t = input({'prompt':'Pattern: ','default':'','completion':"custom,vsm#CompletionForSearchAndReplaceToken",'highlight':'vsm#HighlightWhileTypingVisual'})
     if l:t == ""
         execute ":norm `z"
+        call matchdelete(w:region)
         return
     endif
     call setreg("/", "\\%V" . l:t)
     exe "redraw"
     execute ":norm `z"
+    call matchdelete(w:region)
+    call inputrestore()
     set hlsearch
     exe "redraw"
-    call inputrestore()
 endfunction
 
 function! vsm#ComplexRepalce(target)
@@ -66,7 +77,7 @@ function! vsm#ComplexRepalce(target)
             endif
             let l:res = substitute(getreg('z') , l:pattern , a:target  , 'g')
             call setreg('z',l:res)
-            exe ':norm gv"_d"zP'
+            exe ':norm gv"zp'
         else
             let l:pattern = trim(getreg('/'),"\%V")
             exe "'<,'>s/" . l:pattern . "/".a:target . "/g"
@@ -76,12 +87,15 @@ endfunction
 
 function! vsm#InteractiveReplace()
     call inputsave()
-    let l:target = input({'prompt':'Replace: ','default':'','canelreturn':-1,'highlight':'vsm#HighlightWhileReplace'})
+    let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
+    let l:target = input({'prompt''Replace ','default''\0','canelreturn'-1,'highlight''vsm#HighlightWhileReplace'})
     if l:target == -1
         execute ":norm `z"
+        call matchdelete(w:h)
         return
     endif
     call vsm#ComplexRepalce(l:target)
+    call matchdelete(w:region)
     call inputrestore()
     execute ":norm `z"
 endfunction
