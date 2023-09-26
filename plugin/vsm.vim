@@ -35,11 +35,15 @@ endfunction
 
 function! vsm#HighlightWhileReplace(cmdline)
     let l:pattern = trim(getreg('/'),"\%V")
+    let l:crnt_changenr = changenr()
     try
         call vsm#ComplexRepalce(a:cmdline)
     endtry
-    exe "redraw"
-    exe ":undo!"
+    " If there is a change undo it, optherwise don't
+    if changenr() > l:crnt_changenr
+        exe "redraw"
+        exe ":undo!"
+    endif
     return []
 endfunction
 
@@ -65,7 +69,7 @@ endfunction
 
 function! vsm#ComplexRepalce(target)
     if len(a:target) >= 2 && a:target[0] == '@'
-        exe "g/" . getreg('/')  . "/:norm " . a:target[1:]
+        exe "'<,'>g/" . getreg('/')  . "/:norm " . a:target[1:]
     else
         exe ':norm gv"zy'
         let l:pattern = getreg('/')
@@ -80,7 +84,6 @@ endfunction
 
 
 function! vsm#InteractiveReplace()
-    execute ":norm mz"
     let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
     let l:target = input({'prompt':'Replace ','default':'' ,'canelreturn':-1,'highlight':'vsm#HighlightWhileReplace'})
     if l:target == -1

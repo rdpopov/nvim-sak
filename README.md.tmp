@@ -28,14 +28,14 @@ contents of register `/` and the contents of `/` with `<\` and `\>` around it.
 Replace part deletes if canceled with `<Esc>` or confirmed on empty. If canceled
 it cancels the whole replace.
 ## Demo
-![](.demo.gif)
+
 
 ## Some caveats
 While achieving my goals for editing they are still powered by sed, so all of
 its limitations follow, and how it behaves could depend on your configuration.
 
 Also it is inefficient in it's implementation, the indented use case is small
-files and small changes. Otherwise I think it will cause too many updates. Still
+files and small changes. Otherwise i think it will cause too many updates. Still
 haven't had any problems.
 
 By default it uses mark `z` and register `z` during normal operation.
@@ -79,7 +79,7 @@ Lua:
 ## Things to be added
 - [ ] Something to mimic the behaviour of `gcn` to be able to use more
   commands(maybe)
-- [x] Add gif a demo for both commands
+- [ ] Add gif a demo for both commands
 
 
 ## Why this is a thing?
