@@ -44,7 +44,6 @@ function! vsm#HighlightWhileReplace(cmdline)
 endfunction
 
 function! vsm#HighlightInMotion(type, ...)
-    call inputsave()
     let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
     let l:t = ""
     set nohlsearch
@@ -60,7 +59,6 @@ function! vsm#HighlightInMotion(type, ...)
     exe "redraw"
     execute ":norm `z"
     call matchdelete(w:region)
-    call inputrestore()
     set hlsearch
     exe "redraw"
 endfunction
@@ -69,35 +67,30 @@ function! vsm#ComplexRepalce(target)
     if len(a:target) >= 2 && a:target[0] == '@'
         exe "g/" . getreg('/')  . "/:norm " . a:target[1:]
     else
-        if line("'<") == line("'>") " if marks are on the same line, the '> wont be adjusted so it wiull bew broken or lines change
-            exe ':norm gv"zy'
-            let l:pattern = getreg('/')
-            if l:pattern[:2] == "\\%V"
-                let l:pattern = l:pattern[3:]
-            endif
-            let l:res = substitute(getreg('z') , l:pattern , a:target  , 'g')
-            call setreg('z',l:res)
-            exe ':norm gv"zp'
-        else
-            let l:pattern = trim(getreg('/'),"\%V")
-            exe "'<,'>s/" . l:pattern . "/".a:target . "/g"
+        exe ':norm gv"zy'
+        let l:pattern = getreg('/')
+        if l:pattern[:2] == "\\%V"
+            let l:pattern = l:pattern[3:]
         endif
+        let l:res = substitute(getreg('z') , l:pattern , a:target  , 'g')
+        call setreg('z',l:res)
+        exe ':norm gv"zp'
     endif
 endfunction
 
+
 function! vsm#InteractiveReplace()
-    call inputsave()
+    execute ":norm mz"
     let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
-    let l:target = input({'prompt''Replace ','default''\0','canelreturn'-1,'highlight''vsm#HighlightWhileReplace'})
+    let l:target = input({'prompt':'Replace ','default':'' ,'canelreturn':-1,'highlight':'vsm#HighlightWhileReplace'})
     if l:target == -1
-        execute ":norm `z"
+        execute ":norm `<"
         call matchdelete(w:h)
         return
     endif
     call vsm#ComplexRepalce(l:target)
     call matchdelete(w:region)
-    call inputrestore()
-    execute ":norm `z"
+    execute ":norm `<"
 endfunction
 
 nnoremap <silent> <Plug>VsmHighlightInMotion mz:set opfunc=vsm#HighlightInMotion<CR>g@
