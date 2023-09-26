@@ -1,7 +1,8 @@
 if exists("g:loaded_vsm") || &cp || v:version < 700
-    finish
-endif
+    finish endif
 let g:loaded_vsm = 1
+" TODO:
+" Add configuration registers to sue and marks
 
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
     let empty_line = "^$"
@@ -60,6 +61,7 @@ function! vsm#HighlightInMotion(type, ...)
     exe "redraw"
     execute ":norm `z"
     set hlsearch
+    exe "redraw"
 endfunction
 
 function! vsm#ComplexRepalce(target)
@@ -79,7 +81,7 @@ function! vsm#ComplexRepalce(target)
             endif
             let l:res = substitute(getreg('x') , l:pattern , a:target , 'g')
             call setreg('x',l:res)
-            exe ':norm gv"_d"xp'
+            exe ':norm gv"_d"xP'
         else
             let l:pattern = trim(getreg('/'),"\%V")
             exe "'<,'>s/" . l:pattern . "/".a:target. "/g"
@@ -97,6 +99,6 @@ function! vsm#InteractiveReplace()
     execute ":norm `z"
 endfunction
 
-nnoremap <silent> <Plug>VsmHighlight mz:set opfunc=vsm#HighlightInMotion<CR>g@
+nnoremap <silent> <Plug>VsmHighlightInMotion mz:set opfunc=vsm#HighlightInMotion<CR>g@
 nnoremap <silent> <Plug>VsmInteractiveReplace mz:call vsm#InteractiveReplace()<CR>
 
