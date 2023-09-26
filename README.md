@@ -3,19 +3,19 @@
 A simple-ish wrapper around sed to approximate select mode from
 helix/kakoune
 
-## How it works and limitations
+## How it works
 The plugin provides 2 main functions.
 ``` vim
-    <Plug>VsmHighlightInMotion
+    <Plug>VsmHighlightInMotion 
 ```
-And
+    And
 ``` vim
     <Plug>VsmInteractiveReplace
 ```
 
 They can be used separately from each other. While in hx/kak selection must be
 followed by a replace, I find that VsmHighlight is useful by itself. Also, the
-selection can be repeated with a '.' since it was an operator. There is a
+selection can be repeated with a `.` since it was an operator. There is a
 completion menu with the pattern from the last search to match it whole words or
 as a sub string. Both very useful
 
@@ -26,16 +26,24 @@ replace can happen multiple time with the same pattern. But what the pattern is
 replaced with should be entered every time. Since it uses sed, sed-fu is also
 allowed
 
-While achieving my goals for editing they are still powered by sed,
-so all of its limitations follow, and how it behaves could depend on
-your configuration.
+I have added completion to both prompts. Highlight has some common patterns, the
+contents of register `/` and the contents of `/` with `<\` and `\>` around it.
+Replace part deletes if canceled with `<Esc>` or confirmed on empty. If canceled
+it cancels the whole replace.
 
-Also it is inefficient in it's implementation, the indented use case is
-small files and small changes. 
+## Some caveats
+While achieving my goals for editing they are still powered by sed, so all of
+its limitations follow, and how it behaves could depend on your configuration.
+
+Also it is inefficient in it's implementation, the indented use case is small
+files and small changes. Otherwise i think it will cause too many updates. Still
+haven't had any problems.
+
+By default it uses mark `z` and register `z` during normal operation.
 
 ## My example uses
 ### VsmHighlight
-- highlight all the occurrences of a pattern in a textobject, and also jump
+- highlight ls the occurrences of a pattern in a textobject, and also jump
   between them. This can be function, block, sentence, end of the line, etc.
 
 ### VsmInteractiveReplace
@@ -45,10 +53,6 @@ small files and small changes.
 - Refactoring a variable.
 - Execute a :g norm command on lines with the match. - If the replace pattern
   begins with @, it will be interpreted as the arguments to a :g norm command
-
-
-### Demo
-TODO: Create demo
 
 ## Setup
 There isn't much for setup. Install with plugin manager of choice.
@@ -66,15 +70,20 @@ Lua:
     vim.api.nvim_set_keymap('n','s', '<Plug>VsmHighlightInMotion', {
         noremap = true,
         silent = true,
-        desc="Highlight in current selecetion"})
+        desc="Highlight in motion"})
     vim.api.nvim_set_keymap('n','<Leader>r', '<Plug>VsmInteractiveReplace',{
             noremap = true,
             silent = true,
             desc="Replace in visuial selection"})
 ```
 
+## Things to be added
+- [ ] Something to mimic the behaviour of `gcn` to be able to use more
+  commands(maybe)
+- [ ] Add gif a demo for both commands
+
+
 ## Why this is a thing?
-Tried kakoune and helix, liked this mode. And I would consider switching
-to them just for this. It makes it a little bit easier to work with. Rather
-than witting a sed expression, you just do it in a few keystrokes. It's
-just convenience, then again what plugin isn't.
+Tried kak and helix, liked this mode. And I would consider switching to them
+just for this. This kinda gives me the main thing that their modes do. It
+doesn't have the transformations that can be done with kak, don't need them.

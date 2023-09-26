@@ -4,7 +4,7 @@ endif
 let g:loaded_vsm = 1
 
 " TODO:
-" Add configuration registers to sue and marks
+" Add configuration registers to use and marks
 
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
     let empty_line = "^$"
@@ -15,20 +15,6 @@ function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
         let l:rstr = trim(r,"\<|\>")
         let l:res_list = uniq([rstr,"\\<".rstr."\\>","\\w\\+","\\d\\+"])
         if len(res_list) == 2
-            let l:res_list += [""]
-        endif
-        return join(l:res_list,"\n")
-    endif
-endfunction
-
-function! vsm#CompletionForSearchAndReplaceTarget(ArgLead, CmdLine,...)
-    let r = trim(getreg('/'),"\\%V")
-    if r == ""
-        return join([''],"\n")
-    else
-        let l:rstr = r "trim(r,"\<|\>")
-        let l:res_list = uniq([r,rstr,"<delete>",a:ArgLead])
-        if len(l:res_list) == 2
             let l:res_list += [""]
         endif
         return join(l:res_list,"\n")
@@ -51,6 +37,7 @@ function! vsm#HighlightWhileReplace(cmdline)
 endfunction
 
 function! vsm#HighlightInMotion(type, ...)
+    call inputsave()
     let l:t = ""
     set nohlsearch
     execute "norm `]v`[\<esc>"
@@ -64,43 +51,40 @@ function! vsm#HighlightInMotion(type, ...)
     execute ":norm `z"
     set hlsearch
     exe "redraw"
+    call inputrestore()
 endfunction
 
 function! vsm#ComplexRepalce(target)
-    if a:target == "<delete>"
-        let a:target = ""
-    endif
-    if a:target[0] == '@'
-        if len(a:target) > 2
-            exe "g/" . getreg('/')  . "/:norm " . a:target[1:]
-        endif
+    if len(a:target) >= 2 && a:target[0] == '@'
+        exe "g/" . getreg('/')  . "/:norm " . a:target[1:]
     else
         if line("'<") == line("'>") " if marks are on the same line, the '> wont be adjusted so it wiull bew broken or lines change
-            exe ':norm gv"xy'
+            exe ':norm gv"zy'
             let l:pattern = getreg('/')
             if l:pattern[:2] == "\\%V"
                 let l:pattern = l:pattern[3:]
             endif
-            let l:res = substitute(getreg('x') , l:pattern , a:target , 'g')
-            call setreg('x',l:res)
-            exe ':norm gv"_d"xP'
+            let l:res = substitute(getreg('z') , l:pattern , a:target  , 'g')
+            call setreg('z',l:res)
+            exe ':norm gv"_d"zP'
         else
             let l:pattern = trim(getreg('/'),"\%V")
-            exe "'<,'>s/" . l:pattern . "/".a:target. "/g"
+            exe "'<,'>s/" . l:pattern . "/".a:target . "/g"
         endif
     endif
 endfunction
 
 function! vsm#InteractiveReplace()
-    let l:target = input({'prompt':'Replace: ','default':'','completion':"custom,vsm#CompletionForSearchAndReplaceTarget",'highlight':'vsm#HighlightWhileReplace'})
-    if l:target == ""
+    call inputsave()
+    let l:target = input({'prompt':'Replace: ','default':'','canelreturn':-1,'highlight':'vsm#HighlightWhileReplace'})
+    if l:target == -1
         execute ":norm `z"
         return
     endif
     call vsm#ComplexRepalce(l:target)
+    call inputrestore()
     execute ":norm `z"
 endfunction
 
 nnoremap <silent> <Plug>VsmHighlightInMotion mz:set opfunc=vsm#HighlightInMotion<CR>g@
 nnoremap <silent> <Plug>VsmInteractiveReplace mz:call vsm#InteractiveReplace()<CR>
-
