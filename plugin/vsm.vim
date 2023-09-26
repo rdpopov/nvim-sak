@@ -12,13 +12,21 @@ let g:loaded_vsm = 1
 " Add configuration registers to use and marks and maybe color groups
 
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
-    let empty_line = "^$"
-    let r = trim(getreg('/'),"\\%V")
-    if r == ""
+    let l:r = getreg('/')
+    if l:r[:2] == "\\%V"
+        let l:r = l:r[3:]
+    endif
+    if l:r == ""
         return join([''],"\n")
     else
-        let l:rstr = trim(r,"\<|\>")
-        let l:res_list = uniq([rstr,"\\<".rstr."\\>","\\w\\+","\\d\\+"])
+        let l:rstr = r
+        if l:r[:1] == "\\<"
+            let l:rstr = l:rstr[2:]
+        endif
+        if l:rstr[-2:] == "\\>"
+            let l:rstr = l:rstr[:-3]
+        endif
+        let l:res_list = uniq([l:rstr,"\\<".l:rstr."\\>","\\w\\+","\\d\\+"])
         if len(res_list) == 2
             let l:res_list += [""]
         endif
