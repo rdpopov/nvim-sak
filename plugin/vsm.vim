@@ -1,7 +1,8 @@
 if exists("g:loaded_vsm") || &cp || v:version < 700
-    finish endif
-let g:loaded_vsm = 1
+    finish
 endif
+let g:loaded_vsm = 1
+
 " TODO:
 " Add configuration registers to sue and marks
 
