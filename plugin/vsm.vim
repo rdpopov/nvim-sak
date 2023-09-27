@@ -7,6 +7,7 @@ if exists("g:loaded_vsm") || &cp || v:version < 700
     finish
 endif
 let g:loaded_vsm = 1
+let s:visual_selection_pattern = ".\\%>'<.*\\%<'>.."
 
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
     let l:r = getreg('/')
@@ -32,16 +33,13 @@ function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
 endfunction
 
 function! vsm#HighlightWhileTypingVisual(cmdline)
-    let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
     let w:h = matchadd('IncSearch', "\\%V" . a:cmdline)
     exe "redraw"
     call matchdelete(w:h)
-    call matchdelete(w:region)
     return []
 endfunction
 
 function! vsm#HighlightWhileReplace(cmdline)
-    let w:region = matchadd('CursorColumn', ".\\%>'<.*\\%<'>.." )
     let l:pattern = trim(getreg('/'),"\%V")
     let l:crnt_changenr = changenr()
     try
@@ -52,7 +50,6 @@ function! vsm#HighlightWhileReplace(cmdline)
         exe "redraw"
         exe ":undo!"
     endif
-    call matchdelete(w:region)
     return []
 endfunction
 
@@ -60,6 +57,7 @@ function! vsm#HighlightInMotion(type, ...)
     let l:t = ""
     set nohlsearch
     execute "norm `]v`[\<esc>"
+    let w:region = matchadd('CursorColumn', s:visual_selection_pattern )
     exe "redraw"
     let l:t = input({'prompt':'Pattern: ','default':'','completion':"custom,vsm#CompletionForSearchAndReplaceToken",'highlight':'vsm#HighlightWhileTypingVisual'})
     if l:t == ""
@@ -89,6 +87,7 @@ function! vsm#ComplexRepalce(target)
 endfunction
 
 function! vsm#InteractiveReplace()
+    let w:region = matchadd('CursorColumn', s:visual_selection_pattern )
     let l:target = input({'prompt':'Replace ','default':'\0' ,'canelreturn':-1,'highlight':'vsm#HighlightWhileReplace'})
     if l:target == -1
         execute ":norm `<"
@@ -97,6 +96,17 @@ function! vsm#InteractiveReplace()
     call vsm#ComplexRepalce(l:target)
     execute ":norm `<"
 endfunction
+
+function! vsm#CleanupRegionHighlight()
+    for i in getmatches()
+    if i["pattern"] == s:visual_selection_pattern
+        call matchdelete(i["id"])
+    endif
+    endfor
+endfunction
+
+" if function is canceled with ctl-c i won't be able to cleanup highlights
+au! ModeChanged c:n call vsm#CleanupRegionHighlight()
 
 nnoremap <silent> <Plug>VsmHighlightInMotion mz:set opfunc=vsm#HighlightInMotion<CR>g@
 nnoremap <silent> <Plug>VsmInteractiveReplace mz:call vsm#InteractiveReplace()<CR>
