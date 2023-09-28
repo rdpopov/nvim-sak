@@ -55,7 +55,6 @@ endfunction
 
 function! vsm#HighlightInMotion(type, ...)
     let l:t = ""
-    set nohlsearch
     execute "norm `]v`[\<esc>"
     let w:region = matchadd('CursorColumn', s:visual_selection_pattern )
     exe "redraw"
@@ -98,11 +97,13 @@ function! vsm#InteractiveReplace()
 endfunction
 
 function! vsm#CleanupRegionHighlight()
+    try
     for i in getmatches()
-    if i["pattern"] == s:visual_selection_pattern
+    if  get(i,'pattern',"")== s:visual_selection_pattern
         call matchdelete(i["id"])
     endif
     endfor
+    endtry
 endfunction
 
 " if function is canceled with ctl-c i won't be able to cleanup highlights
