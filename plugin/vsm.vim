@@ -106,6 +106,29 @@ function! vsm#CleanupRegionHighlight()
     endtry
 endfunction
 
+" little idea baout a more nicely behaving multicursor
+" function! vsm#CursorPosiotions(patt)
+"     let l:res = {}
+"     while v:true
+"         if a:patt != "" 
+"             call setreg('/',a:patt)
+"         endif
+"         exe ":norm n"
+"         let l:pos = getcurpos()[1:2]
+"         if index(get(l:res,l:pos[0],[]),l:pos[1]) != -1
+"             break
+"         endif
+"         let l:res[l:pos[0]] = add(get(l:res,l:pos[0],[]),l:pos[1])
+"     endwhile
+"     return l:res
+" endfunction
+
+" function! vsm#GenerateCommands(patt)
+"     let l:cursors = CursorPosiotions(a:patt)
+"     echo getchar()
+" endfunction
+
+
 " if function is canceled with ctl-c i won't be able to cleanup highlights
 au! ModeChanged c:n call vsm#CleanupRegionHighlight()
 
