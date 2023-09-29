@@ -2,6 +2,7 @@
 
 A simple-ish wrapper around sed to approximate select mode from
 helix/kakoune
+## Only works in neovim!!!
 
 ## How it works
 The plugin provides 2 main functions.
