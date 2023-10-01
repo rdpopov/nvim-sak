@@ -97,13 +97,13 @@ function! vsm#InteractiveReplace()
 endfunction
 
 function! vsm#CleanupRegionHighlight()
-    try
     for i in getmatches()
-    if  get(i,'pattern',"")== s:visual_selection_pattern
-        call matchdelete(i["id"])
-    endif
+        if has_key(i,'pattern')
+            if  i['pattern'] == s:visual_selection_pattern 
+                call matchdelete(i["id"])
+            endif
+        endif
     endfor
-    endtry
 endfunction
 
 " if function is canceled with ctl-c i won't be able to cleanup highlights
