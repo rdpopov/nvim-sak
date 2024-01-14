@@ -106,8 +106,30 @@ function! vsm#CleanupRegionHighlight()
     endfor
 endfunction
 
+function! vsm#AccPattern()
+    exe ':norm gv"zy'
+    let l:pattern = getreg('/')
+    let l:txt = getreg('z')
+    let l:res = []
+    if l:pattern[:2] == "\\%V"
+        let l:pattern = l:pattern[3:]
+    endif
+    while v:true
+        let l:crnt = matchstrpos(l:txt,l:pattern,0)
+        if l:crnt[2] != -1
+            let l:strt = l:crnt[2]
+            let l:res = l:res + [l:crnt[0]]
+            let l:txt = l:txt[l:strt:]
+        else
+            break
+        endif
+    endwhile
+    call setreg('+',join(l:res,"\n"))
+endfunction
 " if function is canceled with ctl-c i won't be able to cleanup highlights
 au! ModeChanged c:n call vsm#CleanupRegionHighlight()
 
 nnoremap <silent> <Plug>VsmHighlightInMotion mz:set opfunc=vsm#HighlightInMotion<CR>g@
+nnoremap <Plug>VsmAcc mz:call vsm#AccPattern()<CR>
 nnoremap <silent> <Plug>VsmInteractiveReplace mz:call vsm#InteractiveReplace()<CR>
+
