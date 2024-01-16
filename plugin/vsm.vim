@@ -8,7 +8,6 @@ if exists("g:loaded_vsm") || &cp || v:version < 700
 endif
 let g:loaded_vsm = 1
 let s:visual_selection_pattern = ".\\%>'<.*\\%<'>.."
-
 function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
     let l:r = getreg('/')
     if l:r[:2] == "\\%V"
@@ -24,13 +23,18 @@ function! vsm#CompletionForSearchAndReplaceToken(ArgLead, CmdLine,...)
         if l:rstr[-2:] == "\\>"
             let l:rstr = l:rstr[:-3]
         endif
-        let l:res_list = uniq([l:rstr,"\\<".l:rstr."\\>","\\w\\+","\\d\\+"])
+        let l:addMore = []
+        if stridx(a:CmdLine, "\\w\\+") == -1
+            let l:addMore = [a:CmdLine, a:CmdLine . "\\w\\+"]
+        endif
+        let l:res_list = uniq([l:rstr,"\\<".l:rstr."\\>","\\w\\+","\\d\\+"] + l:addMore)
         if len(res_list) == 2
             let l:res_list += [""]
         endif
         return join(l:res_list,"\n")
     endif
 endfunction
+
 
 function! vsm#HighlightWhileTypingVisual(cmdline)
     let w:h = matchadd('IncSearch', "\\%V" . a:cmdline)
