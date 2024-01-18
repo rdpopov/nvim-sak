@@ -1,4 +1,4 @@
-# vim-select-mode
+# vim-sak
 
 A simple-ish wrapper around sed to approximate select mode from
 helix/kakoune
