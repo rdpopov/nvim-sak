@@ -57,12 +57,13 @@ M.high_in_motion = function ()
         -- vim.fn.matchdelete(region)
         if input then
             vim.fn.setreg("/", "\\%V" .. input)
+            vim.opt.hlsearch = true
             vim.cmd[[redraw | norm `z]]
-            vim.opt_local.hlsearch = true
             vim.cmd[[redraw]]
         else
             vim.cmd[[:norm `z]]
         end
+
     end)
 end
 
@@ -84,22 +85,23 @@ end
 
 M.interactive_replace = function ()
     local region = vim.fn.matchadd('CursorColumn', visual_selection_pattern )
+    vim.cmd('set lazyredraw')
     local text = vim.ui.input({
         prompt ='Replace: ',
-        default = '\0',
-        -- completion ="custom,v:lua.require'vim-sak'.compl",
+        default = '\\0',
         highlight = function (cmd)
             local pattern = vim.fn.trim(vim.fn.getreg('/'),"\\%V")
             local crnt_change_nr = vim.fn.changenr()
             M.complex_replace(cmd)
             -- If there is a change undo it, optherwise don't
             if vim.fn.changenr() > crnt_change_nr then
-                vim.cmd("redraw | undo!")
+                vim.cmd("redraw! ")
+                vim.cmd("undo!")
             end
             return {}
         end
     }, function (input)
-        print(input)
+        vim.cmd('set nolazyredraw')
         if input ~= nil then
             M.complex_replace(input)
         else
@@ -130,7 +132,4 @@ M.accumulate_pattern = function()
     vim.cmd[[:norm `z]]
 end
 
--- nnoremap <Plug>VimSakHihglightInMotion mz:set opfunc=v:lua.require'vim-sak'.high_in_motion<CR>g@
--- nnoremap <Plug>VimSakInteractiveReplace mz:lua require'vim-sak'.interactive_replace() <CR>
--- nnoremap <Plug>VimSakAccumulate mz:lua require'vim-sak'.accumulate_pattern() <CR>
 return M

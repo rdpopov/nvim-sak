@@ -7,8 +7,9 @@ helix/kakoune
 ## How it works
 The plugin provides 2 main functions.
 ``` vim
-    <Plug>VsmHighlightInMotion 
-    <Plug>VsmInteractiveReplace
+<Plug>VimSakHihglightInMotion
+<Plug>VimSakInteractiveReplace
+<Plug>VimSakAccumulate
 ```
 
 They can be used separately from each other. While in hx/kak selection must be
@@ -42,11 +43,17 @@ haven't had any problems.
 By default it uses mark `z` and register `z` during normal operation.
 
 ## My example uses
-### VsmHighlight
+### VimSakHihglightInMotion
 - highlight ls the occurrences of a pattern in a textobject, and also jump
   between them. This can be function, block, sentence, end of the line, etc.
 
-### VsmInteractiveReplace
+### VimSakAccumulate
+- This collects all the matches in the selection and puts them separated by a
+  new line in the '+' register
+- Not as useful if using just a plain text pattern, but if using a regex is
+  quite useful
+
+### VimSakInteractiveReplace
 - Split a line on a certain symbol/s. This is kinda tricky to do with sed
   sometimes, especially if on the same line and with visual mode patterns.
 - Add/remove/prepend/append to pattern.
@@ -61,20 +68,18 @@ And these are the keymaps I use.
 
 Vimscript:
 ``` vim
-    nnoremap <silent> s <Plug>VsmHighlightInMotion
-    nnoremap <silent> <leader>r <Plug>VsmInteractiveReplace
 ```
 
+nnnoremap s <Plug>VimSakHihglightInMotion
+nnnoremap <Leader>r <Plug>VimSakInteractiveReplace
+nnnoremap <Leader>c <Plug>VimSakAccumulate
+
 Lua:
+
 ``` lua
-    vim.api.nvim_set_keymap('n','s', '<Plug>VsmHighlightInMotion', {
-        noremap = true,
-        silent = true,
-        desc="Highlight in motion"})
-    vim.api.nvim_set_keymap('n','<Leader>r', '<Plug>VsmInteractiveReplace',{
-            noremap = true,
-            silent = true,
-            desc="Replace in visuial selection"})
+keymap('n','s', '<Plug>VimSakHihglightInMotion',{noremap = true, silent = true, desc="Highlight in current selecetion"})
+keymap('n','<Leader>r', '<Plug>VimSakInteractiveReplace',{noremap = true, silent = true, desc="Replace in visuial selection"})
+keymap('n','<Leader>c', '<Plug>VimSakAccumulate',{noremap = true, desc="Accumilate strings matching the pattern in visal selection"})
 ```
 
 ## Things to be added
