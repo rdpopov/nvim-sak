@@ -8,9 +8,12 @@ if exists("g:loaded_vim_sak") || &cp || v:version < 700
 endif
 let g:loaded_vim_sak = 1
 
-nnoremap <Plug>VimSakHihglightInMotion mz:set opfunc=v:lua.require'vim-sak'.high_in_motion<CR>g@
-nnoremap <Plug>VimSakInteractiveReplace mz:lua require'vim-sak'.interactive_replace()<CR>
-nnoremap <Plug>VimSakAccumulate mz:lua require'vim-sak'.accumulate_pattern()<CR>
+nnoremap <silent> <Plug>VimSakHihglightInMotion mz:set opfunc=v:lua.require'nvim-sak'.high_in_motion<CR>g@
+nnoremap <silent> <Plug>VimSakInteractiveReplace mz:lua require'nvim-sak'.interactive_replace()<CR>
+nnoremap <silent> <Plug>VimSakAccumulate mz:lua require'nvim-sak'.accumulate_pattern()<CR>
+
+nnoremap <silent> <Plug>VimSakInterleave mz:lua require'nvim-sak'.interleave_from_register()<CR>
+nnoremap <silent> <Plug>VimSakRotate mz:lua require'nvim-sak'.rotate_patterns()<CR>
 
 function! vsm#CleanupRegionHighlight()
     for i in getmatches()

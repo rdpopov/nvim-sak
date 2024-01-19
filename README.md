@@ -7,9 +7,11 @@ helix/kakoune
 ## How it works
 The plugin provides 2 main functions.
 ``` vim
-<Plug>VimSakHihglightInMotion
-<Plug>VimSakInteractiveReplace
+<Plug>VimSakHihglightInMotion 
+<Plug>VimSakInteractiveReplace 
 <Plug>VimSakAccumulate
+<Plug>VimSakInterleave
+<Plug>VimSakRotate
 ```
 
 They can be used separately from each other. While in hx/kak selection must be
