@@ -110,15 +110,9 @@ M.interactive_replace = function ()
     end)
 end
 
-M.accumulate_pattern = function()
-    vim.cmd(':norm gv"zy')
-    local pattern = vim.fn.getreg('/')
-    local txt = vim.fn.getreg('z')
-    local res = {}
-    if string.sub(pattern,1,3) == "\\%V" then
-        pattern = string.sub(pattern,4,-1)
-    end
-    local idx = 0;
+
+function get_all_matches_txt(txt,pattern)
+    res = {}
     while true do
         local crnt = vim.fn.matchstrpos(txt,pattern)
         if crnt[1] ~= ""  then
@@ -128,8 +122,66 @@ M.accumulate_pattern = function()
             break
         end
     end
-    vim.fn.setreg('+',table.concat(res,"\n"))
+end
+
+
+M.accumulate_pattern = function()
+    vim.cmd(':norm gv"zy')
+    local pattern = vim.fn.getreg('/')
+    local txt = vim.fn.getreg('z')
+    if string.sub(pattern,1,3) == "\\%V" then
+        pattern = string.sub(pattern,4,-1)
+    end
+    vim.fn.setreg('+',table.concat(get_all_matches_txt(txt,pattern),"\n"))
     vim.cmd[[:norm `z]]
 end
+
+
+M.interleave_from_register = function()
+    vim.cmd(':norm gv"zy')
+    local gets = vim.fn.split (vim.fn.getreg('+'),"\n")
+    local get_idx = 1
+    local pattern = vim.fn.getreg('/')
+    local txt = vim.fn.getreg('z')
+    local res = {}
+    if string.sub(pattern,1,3) == "\\%V" then
+        pattern = string.sub(pattern,4,-1)
+    end
+    local split_text = vim.fn.split(txt,pattern,true)
+    for _,w in pairs(split_text) do
+        table.insert(res,w)
+        table.insert(res,gets[get_idx])
+        get_idx = (get_idx % #gets) + 1
+    end
+    vim.fn.setreg('+',table.concat(res,""))
+    vim.cmd(':norm gv"zp')
+    vim.cmd[[:norm `z]]
+end
+
+M.rotate_patterns = function()
+    vim.cmd(':norm gv"zy')
+    local pattern = vim.fn.getreg('/')
+    local txt = vim.fn.getreg('z')
+    local all_matches = get_all_matches_txt(txt,pattern)
+    if #all_matches == 0  then
+        return
+    end
+    table.insert(all_matches,table.remove(all_matches)) -- get last and push it to front
+    local match_idx = 1;
+    local res = {}
+    if string.sub(pattern,1,3) == "\\%V" then
+        pattern = string.sub(pattern,4,-1)
+    end
+    local split_text = vim.fn.split(txt,pattern,true)
+    for _,w in pairs(split_text) do
+        table.insert(res,w)
+        table.insert(res,all_matches[match_idx])
+        match_idx = match_idx + 1
+    end
+    vim.fn.setreg('+',table.concat(res,""))
+    vim.cmd(':norm gv"zp')
+    vim.cmd[[:norm `z]]
+end
+
 
 return M
