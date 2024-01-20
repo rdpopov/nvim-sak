@@ -71,7 +71,7 @@ M.high_in_motion = function ()
 
     local text = vim.ui.input({
         prompt ='Pattern: ',
-        completion ="custom,v:lua.require'vim-sak'.compl",
+        completion ="custom,v:lua.require'nvim-sak'.compl",
         highlight = function (cmd)
             local match = vim.fn.matchadd('IncSearch', "\\%V"..cmd .. "\\%V" )
             vim.cmd [[redraw!]]
