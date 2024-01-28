@@ -69,19 +69,24 @@ M.high_in_motion = function ()
     vim.cmd(vim.api.nvim_replace_termcodes("norm gv<Esc>",true,true,true))
     vim.cmd [[redraw!]]
 
+    ok_match = false
     local text = vim.ui.input({
         prompt ='Pattern: ',
         completion ="custom,v:lua.require'nvim-sak'.compl",
         highlight = function (cmd)
-            local match = vim.fn.matchadd('IncSearch', "\\%V"..cmd .. "\\%V" )
-            vim.cmd [[redraw!]]
-            vim.fn.matchdelete(match)
+            ok_match,hl_match = pcall(vim.fn.matchadd,'IncSearch', "\\%V"..cmd .. "\\%V")
+            if ok_match then
+                vim.cmd [[redraw!]]
+                vim.fn.matchdelete(hl_match)
+            end
             return {}
         end
     }, function (input)
         revert_options()
         if input then
-            vim.fn.setreg("/", "\\%V" .. input .. "\\%V")
+            if ok_match then
+                vim.fn.setreg("/", "\\%V" .. input .. "\\%V")
+            end
             vim.opt.hlsearch = true
             vim.cmd[[redraw | norm `z]]
             vim.cmd[[redraw]]
