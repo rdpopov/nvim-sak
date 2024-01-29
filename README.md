@@ -56,28 +56,26 @@ effects. ``` `< ``` is the mark that has has both line and column, but doesn't r
    unchanged. Delete it and t will delete all occurrences of whatever is in the
    search register from whatever is surrounded by the visual marks. It functions
    like a sed command. It is also interactive.On enter confirms the operation.
-   On <Esc> it cancels the operation. If you delete the '\0' and incited the
+   On ```<Esc>``` it cancels the operation. If you delete the '\0' and incited the
    pattern starts with @ it will be interpreted as a ```:'<'>g/{pattern}/:norm
    {your_input_here}``` this is situationally useful.
 
  - <Plug>NvimSakAccumulate
    
    Works with the same assumptions as VsmInteractiveReplace - visually selected
-   place and pattern in /. It collects every occurrence of the pattern in the
-   '+' register, each on a new line. Not as useful if using just a plain text
-   pattern, but if using a regex is quite useful
+   place and pattern in ```/```. It collects every occurrence of the pattern in the
+   ```+``` register, each on a new line. Not as useful if using just a plain text
+   pattern, but if using a regex-pattern is more it's usecase. 
 
  - <Plug>NvimSakInterleave
    
    Works with the same assumptions as VsmInteractiveReplace - visually selected
-   place and pattern in /. It is the inverse (kind of) of NvimSakAccumulate.
-   For every occurrence of pattern in the visual selection it a line from the '+'
+   place and pattern in ```/```. It is the inverse (kind of) of NvimSakAccumulate.
+   For every occurrence of pattern in the visual selection it a line from the ```+```
    register. If the lines end, it goes through them again until all matches are
-   exhausted. With one line in the '+' register it's just replace paste, with
+   exhausted. With one line in the ```+``` register it's just replace paste, with
    more it can be quite useful. Ex: take all the patterns from a selection edit
    them on the side, then return them to their places.
-
-   It collects every occurrence of the pattern in the '+' register.
 
  - <Plug>NvimSakRotate
    
