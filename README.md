@@ -3,13 +3,16 @@
 A simple-ish wrapper around sed to approximate select mode from
 helix/kakoune
 
-## How it works
 
-I wanted something like what kakoune has for multi cursor as you can at least to
-text entry with this. Other plugins that provide multi cursor that have tried
+I wanted something like what kakoune has for multi cursor. It's neat. 
+I want to mostly do text entry with this. Other plugins that provide multi cursor that I have tried
 are either slow or are too much mental overhead to use properly. It's not that
 they are bad though. This feels vim-like to me that I don't even need to think
-about it: <in this  motion> -> <highlight this pattern> -> replace/accumulate/paste/rotate
+about it.
+
+It goes like this: in motion -> highlight pattern -> replace/accumulate/paste/rotate
+
+## How it works
 
 This plugin is a interactive wrapper around sed, with some limitations.
 Currently provides 5 functions:
@@ -33,9 +36,9 @@ Same for the pattern.
 
 While it would probably just be easier just to make a mapping like ```
 :'<,'>s///g``` and it would get you most of the way there, it's not as nicely
-behaved. For example ```'<``` takes the **line** of the mark, therefore if your
-selection is not a fill line selection, whatever you do may have unwanted
-effects. And a``` `< ``` doesn't really work with sed, for some reason.
+behaved. For example ```'<``` takes the **line** of the mark, and in parrtial 
+line visual selection, whatever you do may have unwanted
+effects. ``` `< ``` is the mark that has has both line and column, but doesn't really work with sed, for some reason.
 
  - <Plug>NvimSakHihglightInMotion
    
@@ -68,25 +71,24 @@ effects. And a``` `< ``` doesn't really work with sed, for some reason.
    
    Works with the same assumptions as VsmInteractiveReplace - visually selected
    place and pattern in /. It is the inverse (kind of) of NvimSakAccumulate.
-   For every occurrence of pattern in the visual selection it a line from the +
+   For every occurrence of pattern in the visual selection it a line from the '+'
    register. If the lines end, it goes through them again until all matches are
-   exhausted. With one line in the + register it's just replace paste, with
+   exhausted. With one line in the '+' register it's just replace paste, with
    more it can be quite useful. Ex: take all the patterns from a selection edit
    them on the side, then return them to their places.
 
-   It collects every occurrence of the pattern in the '+'
-   register.
+   It collects every occurrence of the pattern in the '+' register.
 
  - <Plug>NvimSakRotate
    
    Works with the same assumptions as VsmInteractiveReplace - visually selected
    place and pattern in /. Rotates the order of each pattern in a visual selection.
-   Ex: (this, other,else) -> (else, this,other), or just general chaos
+   Ex: (this, other,else) -> (else, this,other), or just general chaos.
 
 - Tbd
   
   There are some other useful ones, that I haven't had the time to implement or
-  haven't thought of 
+  haven't thought of .
 
 ## Demo
 ![](.demo.gif)
