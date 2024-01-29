@@ -2,35 +2,92 @@
 
 A simple-ish wrapper around sed to approximate select mode from
 helix/kakoune
-## Only works in neovim!!!
 
 ## How it works
-The plugin provides 2 main functions.
+
+I wanted something like what kakoune has for multi cursor as you can at least to
+text entry with this. Other plugins that provide multi cursor that have tried
+are either slow or are too much mental overhead to use properly. It's not that
+they are bad though. This feels vim-like to me that I don't even need to think
+about it: <in this  motion> -> <highlight this pattern> -> replace/accumulate/paste/rotate
+
+This plugin is a interactive wrapper around sed, with some limitations.
+Currently provides 5 functions:
 ``` vim
-<Plug>VimSakHihglightInMotion 
-<Plug>VimSakInteractiveReplace 
-<Plug>VimSakAccumulate
-<Plug>VimSakInterleave
-<Plug>VimSakRotate
+<Plug>NvimSakHihglightInMotion 
+<Plug>NvimSakInteractiveReplace 
+<Plug>NvimSakAccumulate
+<Plug>NvimSakInterleave
+<Plug>NvimSakRotate
 ```
+Main ones being
+``` vim
+<Plug>NvimSakHihglightInMotion
+<Plug>NvimSakInteractiveReplace
+```
+They couple nicely with each other but they are not necessarily needed to be
+used together. It uses visual marks and the contents of the search register.
+NvimSakHihglightInMotion is just an easy way to set a region and to set a
+pattern. While replace works with visual marks, and they can be set by anything.
+Same for the pattern.
 
-They can be used separately from each other. While in hx/kak selection must be
-followed by a replace, I find that VsmHighlight is useful by itself. Also, the
-selection can be repeated with a `.` since it was an operator. There is a
-completion menu with the pattern from the last search to match it whole words or
-as a sub string. Both very useful
+While it would probably just be easier just to make a mapping like ```
+:'<,'>s///g``` and it would get you most of the way there, it's not as nicely
+behaved. For example ```'<``` takes the **line** of the mark, therefore if your
+selection is not a fill line selection, whatever you do may have unwanted
+effects. And a``` `< ``` doesn't really work with sed, for some reason.
 
-Similarly, VsmInteractiveReplace is also useful on its own. The region it uses
-is the last visual selection, thus it can be expanded manually beyond the strict
-boundaries of a textobject. The pattern is the last searched pattern. So a
-replace can happen multiple time with the same pattern. But what the pattern is
-replaced with should be entered every time. Since it uses sed, sed-fu is also
-allowed
+ - <Plug>NvimSakHihglightInMotion
+   
+   When given a motion after, it creates an interactive prompt. The entered text
+   gets highlighted as you write, it can also be a pattern. I have added a
+   completion menu for some common patterns, and it also includes the current
+   contents of the / register with ```\<``` and ```\>``` around it. A single tab
+   would just add a ```\w\+``` to the pattern. On enter the pattern is put into
+   the register and will highlight whatever matches it in the current visual
+   selection(which would be the endings of the motion. ex: ```i"```,```ib```, ```a{``` ).
 
-I have added completion to both prompts. Highlight has some common patterns, the
-contents of register `/` and the contents of `/` with `<\` and `\>` around it.
-Replace part deletes if canceled with `<Esc>` or confirmed on empty. If canceled
-it cancels the whole replace.
+ - <Plug>NvimSakInteractiveReplace
+   
+   It provides a prompt wuth a default value of '\0'. That would leave the text
+   unchanged. Delete it and t will delete all occurrences of whatever is in the
+   search register from whatever is surrounded by the visual marks. It functions
+   like a sed command. It is also interactive.On enter confirms the operation.
+   On <Esc> it cancels the operation. If you delete the '\0' and incited the
+   pattern starts with @ it will be interpreted as a ```:'<'>g/{pattern}/:norm
+   {your_input_here}``` this is situationally useful.
+
+ - <Plug>NvimSakAccumulate
+   
+   Works with the same assumptions as VsmInteractiveReplace - visually selected
+   place and pattern in /. It collects every occurrence of the pattern in the
+   '+' register, each on a new line. Not as useful if using just a plain text
+   pattern, but if using a regex is quite useful
+
+ - <Plug>NvimSakInterleave
+   
+   Works with the same assumptions as VsmInteractiveReplace - visually selected
+   place and pattern in /. It is the inverse (kind of) of NvimSakAccumulate.
+   For every occurrence of pattern in the visual selection it a line from the +
+   register. If the lines end, it goes through them again until all matches are
+   exhausted. With one line in the + register it's just replace paste, with
+   more it can be quite useful. Ex: take all the patterns from a selection edit
+   them on the side, then return them to their places.
+
+   It collects every occurrence of the pattern in the '+'
+   register.
+
+ - <Plug>NvimSakRotate
+   
+   Works with the same assumptions as VsmInteractiveReplace - visually selected
+   place and pattern in /. Rotates the order of each pattern in a visual selection.
+   Ex: (this, other,else) -> (else, this,other), or just general chaos
+
+- Tbd
+  
+  There are some other useful ones, that I haven't had the time to implement or
+  haven't thought of 
+
 ## Demo
 ![](.demo.gif)
 
@@ -40,22 +97,22 @@ its limitations follow, and how it behaves could depend on your configuration.
 
 Also it is inefficient in it's implementation, the indented use case is small
 files and small changes. Otherwise I think it will cause too many updates. Still
-haven't had any problems.
+haven't had any problems. For anything big, better straight use sed 
 
 By default it uses mark `z` and register `z` during normal operation.
 
-## My example uses
-### VimSakHihglightInMotion
+## Some of my example uses
+### NvimSakHihglightInMotion
 - highlight ls the occurrences of a pattern in a textobject, and also jump
-  between them. This can be function, block, sentence, end of the line, etc.
+  between them afterwards. This can be function, block, sentence, end of the line, etc.
 
-### VimSakAccumulate
+### NvimSakAccumulate
 - This collects all the matches in the selection and puts them separated by a
   new line in the '+' register
 - Not as useful if using just a plain text pattern, but if using a regex is
   quite useful
 
-### VimSakInteractiveReplace
+### NvimSakInteractiveReplace
 - Split a line on a certain symbol/s. This is kinda tricky to do with sed
   sometimes, especially if on the same line and with visual mode patterns.
 - Add/remove/prepend/append to pattern.
@@ -66,31 +123,35 @@ By default it uses mark `z` and register `z` during normal operation.
 ## Setup
 There isn't much for setup. Install with plugin manager of choice.
 
-And these are the keymaps I use.
-
-Vimscript:
 ``` vim
+Plug 'rdpopov/nvim-sak'
 ```
 
-nnnoremap s <Plug>VimSakHihglightInMotion
-nnnoremap <Leader>r <Plug>VimSakInteractiveReplace
-nnnoremap <Leader>c <Plug>VimSakAccumulate
+And these are the keymaps I use.
 
 Lua:
 
 ``` lua
-keymap('n','s', '<Plug>VimSakHihglightInMotion',{noremap = true, silent = true, desc="Highlight in current selecetion"})
-keymap('n','<Leader>r', '<Plug>VimSakInteractiveReplace',{noremap = true, silent = true, desc="Replace in visuial selection"})
-keymap('n','<Leader>c', '<Plug>VimSakAccumulate',{noremap = true, desc="Accumilate strings matching the pattern in visal selection"})
+keymap('n','s', '<Plug>NvimSakHihglightInMotion',{noremap = true, silent = true, desc="Highlight in current motion"})
+keymap('n','<Leader>r', '<Plug>NvimSakInteractiveReplace',{noremap = true, silent = true, desc="Replace in visuial selection"})
+keymap('n','<Leader>c', '<Plug>NvimSakAccumulate',{noremap = true, desc="Accumilate strings matching the pattern in visal selection"})
+keymap('n','<Leader>i', '<Plug>NvimSakInterleave',{noremap = true, desc="Repace pattern in selection with strings from + registe"})
+keymap('n','<Leader>s', '<Plug>NvimSakRotate',{noremap = true, desc="Rotatates the places of the selected pattern in visual selection"})
 ```
 
-## Things to be added
-- [ ] Something to mimic the behaviour of `gcn` to be able to use more
-  commands(maybe)
-- [x] Add gif a demo for both commands
+Other useful remaps that combo very well with this plugin:
 
+``` lua
+keymap('n',',/', ':nohlsearch<CR>',{noremap = true, silent = true ,desc="Turn temporarily searching highlight off"})
+keymap('x','<leader><leader>', ":normal ",{noremap = true, desc="Execute normal mode command over visual selecetion"})
+keymap('n','Q', '@q',{noremap = true, silent = true,desc = "Shorthand for executing register q"})
+```
 
 ## Why this is a thing?
 Tried kak and helix, liked this mode. And I would consider switching to them
-just for this. This kinda gives me the main thing that their modes do. It
-doesn't have the transformations that can be done with kak, don't need them.
+just for this, it's quite handy. But everything else is different. Helix has no
+plugins/scripting, though the base package is good. Kakoune can be scripted with
+bash, and hwo it interfaces with basic tools is nice, but otherwise also
+esoteric. This kinda gives me the main thing that I liked them for. It doesn't
+doesn't have the transformations that can be done with kakoune, I might add some
+if they become useful.
