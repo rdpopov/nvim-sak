@@ -6,14 +6,13 @@ local states = {
 
 local function setup_options()
     vim.cmd('set lazyredraw')
-
     states.cursorline = vim.o.cursorline
     vim.o.cursorline = false
 end
 
 local function revert_options()
     vim.cmd('set nolazyredraw')
-    vim.o.cursorline = cursorline_state
+    vim.o.cursorline = states.cursorline
 end
 
 local function remove_visual_pattern (rstr)
@@ -35,14 +34,12 @@ local function setup_visual_pattern(rstr)
     local pat = "\\c"
     local patign = "\\C"
     local ret = rstr
-
     -- if it starts with either pat or patign there is already an enforcement of case
-    if vim.o.ignorecase
-        and (string.sub(ret,1,#pat) ~= pat
-            or string.sub(ret,1,#patign) ~= patign) then
-        ret = pat..ret
-    end
-    
+    -- if vim.o.ignorecase
+    --     and (string.sub(ret,1,#pat) ~= pat
+    --         or string.sub(ret,1,#patign) ~= patign) then
+    --     ret = patign..ret
+    -- end
     return "\\%V"..ret .. "\\%V"
 end
 
@@ -62,14 +59,19 @@ M.compl = function (ArgLead,CmdLine,...)
         if string.find(CmdLine,"\\w\\+") == nil then
             pre_res_lst[CmdLine .."\\w\\+"] = CmdLine .."\\w\\+"
         end
+        if vim.o.ignorecase then
+            if string.find(CmdLine,"\\C") == nil then
+                pre_res_lst[CmdLine .."\\C"] = CmdLine .."\\C"
+            end
+        else
+            if string.find(CmdLine,"\\c") == nil then
+                pre_res_lst[CmdLine .."\\c"] = CmdLine .."\\c"
+            end
+        end
         pre_res_lst[rstr] = rstr
-        pre_res_lst["\\c"..rstr] = "\\c"..rstr
-        pre_res_lst["\\C"..rstr] = "\\C"..rstr
         pre_res_lst["\\<" .. rstr .. "\\>"] = "\\<" .. rstr .. "\\>"
         pre_res_lst["\\w\\+"] = "\\w\\+"
         pre_res_lst["\\d\\+"] = "\\d\\+"
-        pre_res_lst["\\c"] = "\\c"
-        pre_res_lst["\\C"] = "\\C"
         local res_lst = {}
         for _, v in pairs(pre_res_lst) do
             table.insert(res_lst,v)
@@ -115,6 +117,7 @@ M.high_in_motion = function ()
         end
         revert_options()
     end)
+
 end
 
 M.complex_replace = function (target)
@@ -155,6 +158,7 @@ M.interactive_replace = function ()
             vim.cmd[[:norm `z]]
         end
     end)
+    vim.cmd[[call vsm#CleanupRegionHighlight()]]
 end
 
 
