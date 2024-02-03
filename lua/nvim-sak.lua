@@ -1,10 +1,13 @@
 M ={}
 
-local cursorline_state = nil
+local states = {
+    cursorline = nil,
+}
 
 local function setup_options()
     vim.cmd('set lazyredraw')
-    cursorline_state = vim.o.cursorline
+
+    states.cursorline = vim.o.cursorline
     vim.o.cursorline = false
 end
 
@@ -13,7 +16,7 @@ local function revert_options()
     vim.o.cursorline = cursorline_state
 end
 
-function remove_visual_pattern (rstr)
+local function remove_visual_pattern (rstr)
     local pat = "\\%V"
     local res = rstr
 
@@ -26,6 +29,21 @@ function remove_visual_pattern (rstr)
     end
 
     return res
+end
+
+local function setup_visual_pattern(rstr)
+    local pat = "\\c"
+    local patign = "\\C"
+    local ret = rstr
+
+    -- if it starts with either pat or patign there is already an enforcement of case
+    if vim.o.ignorecase
+        and (string.sub(ret,1,#pat) ~= pat
+            or string.sub(ret,1,#patign) ~= patign) then
+        ret = pat..ret
+    end
+    
+    return "\\%V"..ret .. "\\%V"
 end
 
 M.compl = function (ArgLead,CmdLine,...)
@@ -44,11 +62,14 @@ M.compl = function (ArgLead,CmdLine,...)
         if string.find(CmdLine,"\\w\\+") == nil then
             pre_res_lst[CmdLine .."\\w\\+"] = CmdLine .."\\w\\+"
         end
-
         pre_res_lst[rstr] = rstr
+        pre_res_lst["\\c"..rstr] = "\\c"..rstr
+        pre_res_lst["\\C"..rstr] = "\\C"..rstr
         pre_res_lst["\\<" .. rstr .. "\\>"] = "\\<" .. rstr .. "\\>"
         pre_res_lst["\\w\\+"] = "\\w\\+"
         pre_res_lst["\\d\\+"] = "\\d\\+"
+        pre_res_lst["\\c"] = "\\c"
+        pre_res_lst["\\C"] = "\\C"
         local res_lst = {}
         for _, v in pairs(pre_res_lst) do
             table.insert(res_lst,v)
@@ -74,7 +95,7 @@ M.high_in_motion = function ()
         prompt ='Pattern: ',
         completion ="custom,v:lua.require'nvim-sak'.compl",
         highlight = function (cmd)
-            ok_match,hl_match = pcall(vim.fn.matchadd,'IncSearch', "\\%V"..cmd .. "\\%V")
+            ok_match,hl_match = pcall(vim.fn.matchadd,'IncSearch', setup_visual_pattern(cmd) )
             if ok_match then
                 vim.cmd [[redraw!]]
                 vim.fn.matchdelete(hl_match)
@@ -82,10 +103,9 @@ M.high_in_motion = function ()
             return {}
         end
     }, function (input)
-        revert_options()
         if input then
             if ok_match then
-                vim.fn.setreg("/", "\\%V" .. input .. "\\%V")
+                vim.fn.setreg("/", setup_visual_pattern(input))
             end
             vim.opt.hlsearch = true
             vim.cmd[[redraw | norm `z]]
@@ -93,7 +113,7 @@ M.high_in_motion = function ()
         else
             vim.cmd[[:norm `z]]
         end
-
+        revert_options()
     end)
 end
 

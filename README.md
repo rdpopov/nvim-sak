@@ -50,6 +50,11 @@ effects. ``` `< ``` is the mark that has has both line and column, but doesn't r
    the register and will highlight whatever matches it in the current visual
    selection(which would be the endings of the motion. ex: ```i"```,```ib```, ```a{``` ).
 
+   This doesnt really play nice with ```ignorecase``` and ```smartcase```.  But
+   if ```ignorecase``` is present the apropriate pattern is added to the front
+   of the string. Add ```\C``` to the front. That is present to the list of
+   completions so it's easy to do.
+
  - <Plug>NvimSakInteractiveReplace
    
    It provides a prompt wuth a default value of '\0'. That would leave the text
@@ -97,7 +102,9 @@ its limitations follow, and how it behaves could depend on your configuration.
 
 Also it is inefficient in it's implementation, the indented use case is small
 files and small changes. Otherwise I think it will cause too many updates. Still
-haven't had any problems. For anything big, better straight use sed 
+haven't had any problems. For anything big, better straight use sed. This thing
+is kind of for the middle ground. Edit too little worth a sed but too big to be
+one edit.
 
 By default it uses mark `z` and register `z` during normal operation.
 
