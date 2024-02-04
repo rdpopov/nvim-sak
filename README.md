@@ -147,6 +147,7 @@ And these are the keymaps I use.
 Lua:
 
 ``` lua
+local keymap = vim.api.nvim_set_keymap
 keymap('n','s', '<Plug>NvimSakHihglightInMotion',{noremap = true, silent = true, desc="Highlight in current motion"})
 keymap('n','<Leader>r', '<Plug>NvimSakInteractiveReplace',{noremap = true, silent = true, desc="Replace in visuial selection"})
 keymap('n','<Leader>c', '<Plug>NvimSakAccumulate',{noremap = true, desc="Accumilate strings matching the pattern in visal selection"})
@@ -157,6 +158,7 @@ keymap('n','<Leader>s', '<Plug>NvimSakRotate',{noremap = true, desc="Rotatates t
 Other useful remaps that combo very well with this plugin:
 
 ``` lua
+local keymap = vim.api.nvim_set_keymap
 keymap('n',',/', ':nohlsearch<CR>',{noremap = true, silent = true ,desc="Turn temporarily searching highlight off"})
 keymap('x','<leader><leader>', ":normal ",{noremap = true, desc="Execute normal mode command over visual selecetion"})
 keymap('n','Q', '@q',{noremap = true, silent = true,desc = "Shorthand for executing register q"})
