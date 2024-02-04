@@ -93,15 +93,16 @@ effects. ``` `< ``` is the mark that has has both line and column, but doesn't r
   There are some other useful ones, that I haven't had the time to implement or
   haven't thought of .
 
+
 ## Demo
  - NvimSakHihglightInMotion + NvimSakInteractiveReplace 
-![](.demo_highandrepl.mp4)
+![](demos/demo_highandrepl.mp4)
  - NvimSakAccumulate + NvimSakInterleave 
-![](.demo_accinterlave.mp4)
+![](demos/demo_accinterlave.mp4)
  - NvimSakRotate pt1
-![](.demo_swap1.mp4)
+![](demos/demo_swap1.mp4)
  - NvimSakRotate pt2
-![](.demo_swap2.mp4)
+![](demos/demo_swap2.mp4)
 
 ## Some caveats
 While achieving my goals for editing they are still powered by sed, so all of
