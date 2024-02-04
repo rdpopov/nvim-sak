@@ -61,9 +61,12 @@ effects. ``` `< ``` is the mark that has has both line and column, but doesn't r
    unchanged. Delete it and t will delete all occurrences of whatever is in the
    search register from whatever is surrounded by the visual marks. It functions
    like a sed command. It is also interactive.On enter confirms the operation.
-   On ```<Esc>``` it cancels the operation. If you delete the '\0' and incited the
-   pattern starts with @ it will be interpreted as a ```:'<'>g/{pattern}/:norm
+   On ```<Esc>``` it cancels the operation. If you delete the '\0' and instead the
+   pattern starts with ```@``` it will be interpreted as a ```:'<'>g/{pattern}/:norm
    {your_input_here}``` this is situationally useful.
+
+   While this is arbitrary, to behave like that, it is also logical to have it as a behaviour, but having 2 mappings for it is too much.
+   I may remove it in the future, but now it comes in handy.
 
  - <Plug>NvimSakAccumulate
    
@@ -91,7 +94,7 @@ effects. ``` `< ``` is the mark that has has both line and column, but doesn't r
 - Tbd
   
   There are some other useful ones, that I haven't had the time to implement or
-  haven't thought of .
+  haven't thought or even had the need for.
 
 
 ## Demo
@@ -136,7 +139,7 @@ By default it uses mark `z` and register `z` during normal operation.
   begins with @, it will be interpreted as the arguments to a :g norm command
 
 ## Setup
-There isn't much for setup. Install with plugin manager of choice.
+There isn't much for setup. Install with plugin manager of choice. Therre isn't any setup, it should get sourced at startup.
 
 ``` vim
 Plug 'rdpopov/nvim-sak'
