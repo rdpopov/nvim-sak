@@ -1,16 +1,14 @@
 # nvim-sak
 
 A simple-ish wrapper around sed to approximate select mode from
-helix/kakoune
+helix/kakoune.
 
+I wanted something like what kakoune has for multi cursor. It's neat. Other
+plugins that provide multi cursor that I have tried are either slow or are too
+much mental overhead to use properly. It's not that they are bad though. This
+feels vim-like to me that I don't even need to think about it.
 
-I wanted something like what kakoune has for multi cursor. It's neat. 
-I want to mostly do text entry with this. Other plugins that provide multi cursor that I have tried
-are either slow or are too much mental overhead to use properly. It's not that
-they are bad though. This feels vim-like to me that I don't even need to think
-about it.
-
-It goes like this: in motion -> highlight pattern -> replace/accumulate/paste/rotate
+It goes like this: ```in motion``` -> ```highlight pattern``` -> ```replace/accumulate/paste/rotate```
 
 ## How it works
 
@@ -28,66 +26,66 @@ Main ones being
 <Plug>NvimSakHihglightInMotion
 <Plug>NvimSakInteractiveReplace
 ```
-They couple nicely with each other but they are not necessarily needed to be
-used together. It uses visual marks and the contents of the search register.
-NvimSakHihglightInMotion is just an easy way to set a region and to set a
-pattern. While replace works with visual marks, and they can be set by anything.
-Same for the pattern.
+It's not mandatory to use them together. Their requirements are visual marks and
+something in the ```/``` register. These can be set otherwise, but they work
+nicely together. Selection can also be adjusted.
 
 While it would probably just be easier just to make a mapping like ```
-:'<,'>s///g``` and it would get you most of the way there, it's not as nicely
-behaved. For example ```'<``` takes the **line** of the mark, and in parrtial 
-line visual selection, whatever you do may have unwanted
-effects. ``` `< ``` is the mark that has has both line and column, but doesn't really work with sed, for some reason.
+:'<,'>s/input()/input()/g``` and it would get you most of the way there, it's not as nicely
+behaved. For example ```'<``` takes the **line** of the mark, and in partial
+line visual selection, whatever you do may have unwanted effects. ``` `< ``` is
+the mark that has has both **line and column**, but doesn't really work with sed,
+for some reason.
 
  - <Plug>NvimSakHihglightInMotion
-   
-   When given a motion after, it creates an interactive prompt. The entered text
-   gets highlighted as you write, it can also be a pattern. I have added a
-   completion menu for some common patterns, and it also includes the current
-   contents of the / register with ```\<``` and ```\>``` around it. A single tab
-   would just add a ```\w\+``` to the pattern. On enter the pattern is put into
-   the register and will highlight whatever matches it in the current visual
-   selection(which would be the endings of the motion. ex: ```i"```,```ib```, ```a{``` ).
 
-   This doesnt really play nice with ```ignorecase``` and ```smartcase```.  But
-   if ```ignorecase``` is present the apropriate pattern is added to the front
-   of the string. Add ```\C``` to the front. That is present to the list of
-   completions so it's easy to do.
+    Requires a motion after(ex: ```sip``` , ```sas```). Creates a prompt with
+    some completions I have decided are common. Text that matches that pattern,
+    gets highlighted as you write. The search is ```.``` repeatable, the last
+    contents of the ```/``` register are included with ```\<``` and ```\>```
+    around it. A single tab would just add a ```\w\+``` to the pattern. On enter
+    the pattern is put into the register and will highlight whatever matches it
+    in the current visual selection(which would be the endings of the motion.
+    ex: ```i"```,```ib```, ```a{``` ).
+
+   This doesn't really play nice with ```ignorecase``` and ```smartcase```.  But
+   If it's on or off he the option gets added to the completion list.
 
  - <Plug>NvimSakInteractiveReplace
    
-   It provides a prompt wuth a default value of '\0'. That would leave the text
+   It provides a prompt with a default value of '\0'. That would leave the text
    unchanged. Delete it and t will delete all occurrences of whatever is in the
    search register from whatever is surrounded by the visual marks. It functions
-   like a sed command. It is also interactive.On enter confirms the operation.
-   On ```<Esc>``` it cancels the operation. If you delete the '\0' and instead the
-   pattern starts with ```@``` it will be interpreted as a ```:'<'>g/{pattern}/:norm
-   {your_input_here}``` this is situationally useful.
+   like a sed command. It is also updates the text while writing. On enter
+   confirms the operation. On ```<Esc>``` it cancels the operation. 
 
-   While this is arbitrary, to behave like that, it is also logical to have it as a behaviour, but having 2 mappings for it is too much.
-   I may remove it in the future, but now it comes in handy.
+   If you delete the '\0' and instead the pattern starts with ```@``` it will be
+   interpreted as a ```:'<'>g/{pattern}/:norm {your_input_here}``` this is useful.
+
+   While this is arbitrary, It's better than having 2 different commands,
+   though I might change my mind on that.
 
  - <Plug>NvimSakAccumulate
    
-   Works with the same assumptions as VsmInteractiveReplace - visually selected
+   Works with the same assumptions as ```NivmSakInteractiveReplace``` - visually selected
    place and pattern in ```/```. It collects every occurrence of the pattern in the
-   ```+``` register, each on a new line. Not as useful if using just a plain text
-   pattern, but if using a regex-pattern is more it's usecase. 
+   ```+``` register, each on a new line.
 
  - <Plug>NvimSakInterleave
    
-   Works with the same assumptions as VsmInteractiveReplace - visually selected
-   place and pattern in ```/```. It is the inverse (kind of) of NvimSakAccumulate.
-   For every occurrence of pattern in the visual selection it a line from the ```+```
-   register. If the lines end, it goes through them again until all matches are
-   exhausted. With one line in the ```+``` register it's just replace paste, with
-   more it can be quite useful. Ex: take all the patterns from a selection edit
-   them on the side, then return them to their places.
+   Works with the same assumptions as ```NvimSakInteractiveReplace``` - visually
+   selected place and pattern in ```/```. It is the inverse (kind of) of
+   ```NvimSakAccumulate```. For every occurrence of pattern in the visual
+   selection it a line from the ```+``` register. If the lines end, it goes
+   through them again until all matches are exhausted. With one it would replace
+   all of them with that one. With one line in the ```+``` register it's just
+   replace paste, with more it can be quite useful. Ex: take all the patterns
+   from a selection edit them on the side, then return them to their places with
+   ```NvimSakInterleave```.
 
  - <Plug>NvimSakRotate
    
-   Works with the same assumptions as VsmInteractiveReplace - visually selected
+   Works with the same assumptions as ```NvimSakInteractiveReplace``` - visually selected
    place and pattern in /. Rotates the order of each pattern in a visual selection.
    Ex: (this, other,else) -> (else, this,other), or just general chaos.
 
@@ -166,12 +164,3 @@ keymap('n',',/', ':nohlsearch<CR>',{noremap = true, silent = true ,desc="Turn te
 keymap('x','<leader><leader>', ":normal ",{noremap = true, desc="Execute normal mode command over visual selecetion"})
 keymap('n','Q', '@q',{noremap = true, silent = true,desc = "Shorthand for executing register q"})
 ```
-
-## Why this is a thing?
-Tried kak and helix, liked this mode. And I would consider switching to them
-just for this, it's quite handy. But everything else is different. Helix has no
-plugins/scripting, though the base package is good. Kakoune can be scripted with
-bash, and hwo it interfaces with basic tools is nice, but otherwise also
-esoteric. This kinda gives me the main thing that I liked them for. It doesn't
-doesn't have the transformations that can be done with kakoune, I might add some
-if they become useful.
