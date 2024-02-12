@@ -107,13 +107,13 @@ for some reason.
 
 ## Some caveats
 While achieving my goals for editing they are still powered by sed, so all of
-its limitations follow, and how it behaves could depend on your configuration.
+its limitations follow. You can't delete with the cursor, wich is a downside,
+buut you get regexes and capture groups, which are versatile.
 
 Also it is inefficient in it's implementation, the indented use case is small
 files and small changes. Otherwise I think it will cause too many updates. Still
-haven't had any problems. For anything big, better straight use sed. This thing
-is kind of for the middle ground. Edit too little worth a sed but too big to be
-one edit.
+haven't had any problems. For anything big, better just use sed. This thing is
+kind of for the middle ground and quick dirty work.
 
 By default it uses mark `z` and register `z` during normal operation.
 

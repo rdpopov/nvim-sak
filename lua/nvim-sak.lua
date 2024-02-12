@@ -31,15 +31,16 @@ local function remove_visual_pattern (rstr)
 end
 
 local function setup_visual_pattern(rstr)
-    local pat = "\\c"
-    local patign = "\\C"
     local ret = rstr
-    -- if it starts with either pat or patign there is already an enforcement of case
-    -- if vim.o.ignorecase
-    --     and (string.sub(ret,1,#pat) ~= pat
-    --         or string.sub(ret,1,#patign) ~= patign) then
-    --     ret = patign..ret
-    -- end
+        if vim.o.ignorecase then
+            if string.find(rstr,"\\C") == nil and string.find(rstr,"\\c") then
+                ret = ret .. "\\c"
+            end
+        else
+            if string.find(rstr,"\\C") == nil and string.find(rstr,"\\c") then
+                ret = ret .. "\\C"
+            end
+        end
     return "\\%V"..ret .. "\\%V"
 end
 
@@ -60,12 +61,12 @@ M.compl = function (ArgLead,CmdLine,...)
             pre_res_lst[CmdLine .."\\w\\+"] = CmdLine .."\\w\\+"
         end
         if vim.o.ignorecase then
-            if string.find(CmdLine,"\\C") == nil then
-                pre_res_lst[CmdLine .."\\C"] = CmdLine .."\\C"
-            end
-        else
             if string.find(CmdLine,"\\c") == nil then
                 pre_res_lst[CmdLine .."\\c"] = CmdLine .."\\c"
+            end
+        else
+            if string.find(CmdLine,"\\C") == nil then
+                pre_res_lst[CmdLine .."\\C"] = CmdLine .."\\C"
             end
         end
         pre_res_lst[rstr] = rstr
@@ -86,7 +87,6 @@ M.high_in_motion = function ()
     setup_options()
 
     vim.cmd(vim.api.nvim_replace_termcodes("norm `]v`[<Esc>",true,true,true))
-    -- higlight region with light hihglight
     local region = vim.fn.matchadd('CursorColumn', visual_selection_pattern )
 
     vim.cmd(vim.api.nvim_replace_termcodes("norm gv<Esc>",true,true,true))
