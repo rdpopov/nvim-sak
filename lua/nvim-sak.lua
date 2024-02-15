@@ -1,18 +1,21 @@
 M ={}
 
+
 local states = {
     cursorline = nil,
+    lazyredraw = nil,
 }
 
 local function setup_options()
-    vim.cmd('set lazyredraw')
     states.cursorline = vim.o.cursorline
     vim.o.cursorline = false
+    states.lazyredraw = vim.o.lazyredraw
+    vim.o.lazyredraw = true
 end
 
 local function revert_options()
-    vim.cmd('set nolazyredraw')
     vim.o.cursorline = states.cursorline
+    vim.o.lazyredraw = states.lazyredraw
 end
 
 local function remove_visual_pattern (rstr)
