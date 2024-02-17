@@ -1,6 +1,5 @@
 M ={}
 
-
 local states = {
     cursorline = nil,
     lazyredraw = nil,
@@ -60,6 +59,7 @@ M.compl = function (ArgLead,CmdLine,...)
             rstr = string.sub(rstr,0,-3)
         end
         local pre_res_lst = {}
+        local cw = vim.fn.expand("<cword>")
         if string.find(CmdLine,"\\w\\+") == nil then
             pre_res_lst[CmdLine .."\\w\\+"] = CmdLine .."\\w\\+"
         end
@@ -76,6 +76,7 @@ M.compl = function (ArgLead,CmdLine,...)
         pre_res_lst["\\<" .. rstr .. "\\>"] = "\\<" .. rstr .. "\\>"
         pre_res_lst["\\w\\+"] = "\\w\\+"
         pre_res_lst["\\d\\+"] = "\\d\\+"
+        pre_res_lst[cw] = cw
         local res_lst = {}
         for _, v in pairs(pre_res_lst) do
             table.insert(res_lst,v)
@@ -125,7 +126,7 @@ end
 
 M.complex_replace = function (target)
     -- execute a macro if we do a 'macro'
-    if #target > 2 and target[0] == '@' then
+    if #target > 2 and target[1] == '@' then
         vim.cmd("'<,'>g/" .. vim.fn.getreg('/')  .. "/:norm "  .. string.sub(target,2,-1))
     else
         vim.cmd(':norm gv"zy')

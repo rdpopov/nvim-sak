@@ -48,8 +48,11 @@ for some reason.
     in the current visual selection(which would be the endings of the motion.
     ex: ```i"```,```ib```, ```a{``` ).
 
-   This doesn't really play nice with ```ignorecase``` and ```smartcase```.  But
-   If it's on or off he the option gets added to the completion list.
+    This doesn't really play nice with ```ignorecase``` and ```smartcase```.  But
+    If it's on or off he the option gets added to the completion list.
+
+    Word under cursor also added to completion list. It is a common pattern, it
+    should be there
 
  - <Plug>NvimSakInteractiveReplace
    
@@ -88,6 +91,19 @@ for some reason.
    Works with the same assumptions as ```NvimSakInteractiveReplace``` - visually selected
    place and pattern in /. Rotates the order of each pattern in a visual selection.
    Ex: (this, other,else) -> (else, this,other), or just general chaos.
+
+ - <Plug>NvimSakPatternProduct (NYI)
+   Sometimes you have to do a bunch of the same boiler plate for a variable. A
+   few repeatable lines, but only the var changes. Idea - write a patterna as
+   the second part of a sed command (```\0``` would be the placeholder for the
+   value). For every line in the ```'+``` register, we substitute that line into
+   the pattern. It has to be a capture group as that is more flexible. It is
+   possible for multiple capture groups to be used, but that would depend on the
+   lines, and that would require preparation.
+
+   It is a possible use case for multicursor, and while it can be done with
+   ```NvimSakInteractiveReplace``` This is less stressful as pattern can be
+   formatted.
 
 - Tbd
   
