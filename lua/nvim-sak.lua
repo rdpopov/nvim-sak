@@ -185,8 +185,8 @@ M.accumulate_pattern = function()
     vim.cmd(':norm gv"zy')
     local txt = vim.fn.getreg('z')
     local pattern = remove_visual_pattern(vim.fn.getreg('/'))
-    vim.fn.setreg('+',table.concat(get_all_matches_txt(txt,pattern),"\n"))
-    vim.cmd[[:norm `z]]
+    vim.fn.setreg('+',[table.concat(get_all_matches_txt(txt,pattern),"\n"))
+    vim.cmd(':norm `z')
 end
 
 M.interleave_from_register = function()
@@ -228,6 +228,23 @@ M.rotate_patterns = function()
         match_idx = match_idx + 1 end
     vim.fn.setreg('z',table.concat(res,""))
     vim.cmd(':norm gv"zp')
+end
+
+M.generate_with_pattern  = function()
+    vim.cmd(':norm gv"zy')
+    local to_insert = vim.fn.split(vim.fn.getreg('+'),"\n")
+    local save_reg = vim.fn.getreg('+')
+    local p = vim.fn.getreg('z')
+    local result = {}
+    for _,w in ipairs(to_insert) do
+        if #w > 0 then
+            local t = vim.fn.substitute(w , w , p , 'g')
+            table.insert(result,t)
+        end
+    end
+    vim.fn.setreg('z',table.concat(result,"\n"))
+    vim.cmd(':norm gv"zp')
+    vim.fn.setreg('+',save_reg)
 end
 
 return M

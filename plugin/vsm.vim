@@ -14,6 +14,7 @@ nnoremap <silent> <Plug>NvimSakAccumulate mz:lua require'nvim-sak'.accumulate_pa
 
 nnoremap <silent> <Plug>NvimSakInterleave mz:lua require'nvim-sak'.interleave_from_register()<CR>
 nnoremap <silent> <Plug>NvimSakRotate mz:lua require'nvim-sak'.rotate_patterns()<CR>
+vnoremap <silent> <Plug>NvimSakGenerate mz:lua require'nvim-sak'.generate_with_pattern()<CR>
 
 function! vsm#CleanupRegionHighlight()
     for i in getmatches()

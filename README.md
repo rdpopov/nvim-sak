@@ -20,6 +20,7 @@ Currently provides 5 functions:
 <Plug>NvimSakAccumulate
 <Plug>NvimSakInterleave
 <Plug>NvimSakRotate
+<Plug>NvimSakGenerate
 ```
 Main ones being
 ``` vim
@@ -92,18 +93,15 @@ for some reason.
    place and pattern in /. Rotates the order of each pattern in a visual selection.
    Ex: (this, other,else) -> (else, this,other), or just general chaos.
 
- - <Plug>NvimSakPatternProduct (NYI)
+ - <Plug>NvimSakGenerate
    Sometimes you have to do a bunch of the same boiler plate for a variable. A
    few repeatable lines, but only the var changes. Idea - write a patterna as
    the second part of a sed command (```\0``` would be the placeholder for the
    value). For every line in the ```'+``` register, we substitute that line into
-   the pattern. It has to be a capture group as that is more flexible. It is
-   possible for multiple capture groups to be used, but that would depend on the
-   lines, and that would require preparation.
+   the pattern. It has to be a capture group as that is more flexible. 
 
    It is a possible use case for multicursor, and while it can be done with
-   ```NvimSakInteractiveReplace``` This is less stressful as pattern can be
-   formatted.
+   ```NvimSakInteractiveReplace``` this is less stressful.
 
 - Tbd
   
@@ -120,6 +118,8 @@ for some reason.
 ![](demos/demo_swap1.gif)
  - NvimSakRotate pt2
 ![](demos/demo_swap2.gif)
+ - NivmSakGenerate
+![](demos/demo_generate.gif)
 
 ## Some caveats
 While achieving my goals for editing they are still powered by sed, so all of
@@ -170,6 +170,7 @@ keymap('n','<Leader>r', '<Plug>NvimSakInteractiveReplace',{noremap = true, silen
 keymap('n','<Leader>c', '<Plug>NvimSakAccumulate',{noremap = true, desc="Accumilate strings matching the pattern in visal selection"})
 keymap('n','<Leader>i', '<Plug>NvimSakInterleave',{noremap = true, desc="Repace pattern in selection with strings from + registe"})
 keymap('n','<Leader>s', '<Plug>NvimSakRotate',{noremap = true, desc="Rotatates the places of the selected pattern in visual selection"})
+keymap('v','<Leader>g', '<Plug>NvimSakGenerate',{noremap = true, silent = true, desc="Genrate for each pattern"})
 ```
 
 Other useful remaps that combo very well with this plugin:
