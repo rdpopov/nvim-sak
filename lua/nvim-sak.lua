@@ -185,7 +185,7 @@ M.accumulate_pattern = function()
     vim.cmd(':norm gv"zy')
     local txt = vim.fn.getreg('z')
     local pattern = remove_visual_pattern(vim.fn.getreg('/'))
-    vim.fn.setreg('+',[table.concat(get_all_matches_txt(txt,pattern),"\n"))
+    vim.fn.setreg('+',table.concat(get_all_matches_txt(txt,pattern),"\n"))
     vim.cmd(':norm `z')
 end
 
