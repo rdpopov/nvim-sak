@@ -126,8 +126,9 @@ end
 
 M.complex_replace = function (target)
     -- execute a macro if we do a 'macro'
-    if #target > 2 and target[1] == '@' then
-        vim.cmd("'<,'>g/" .. vim.fn.getreg('/')  .. "/:norm "  .. string.sub(target,2,-1))
+    if #target >1 and string.sub(target,1,1) == "@" then
+        local pat = string.sub(target,2,-1)
+        vim.cmd(":'<,'>g/" .. remove_visual_pattern(vim.fn.getreg('/'))  .. "/:norm "  .. pat)
     else
         vim.cmd(':norm gv"zy')
         local pattern = remove_visual_pattern(vim.fn.getreg('/'))
