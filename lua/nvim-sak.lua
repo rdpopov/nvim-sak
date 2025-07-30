@@ -32,17 +32,21 @@ local function remove_visual_pattern (rstr)
     return res
 end
 
+-- local
+-- Local
+-- LOCAL
+
 local function setup_visual_pattern(rstr)
     local ret = rstr
-        if vim.o.ignorecase then
-            if string.find(rstr,"\\C") == nil and string.find(rstr,"\\c") then
-                ret = ret .. "\\c"
-            end
+
+    if vim.o.smartcase or vim.o.ignorecase then
+        if string.find(rstr,"[A-Z]")  and string.find(rstr,"\\c") == nil and string.find(rstr,"\\C") == nil then
+            ret = ret .. "\\C"
         else
-            if string.find(rstr,"\\C") == nil and string.find(rstr,"\\c") then
-                ret = ret .. "\\C"
-            end
+            ret = ret .. "\\c"
         end
+    end
+
     return "\\%V"..ret .. "\\%V"
 end
 
